@@ -12,7 +12,6 @@ marked.use({
             if (!text) return "";
             const childText = text.replace(/&quot;/g, '"');
             const importMatched = childText.match(IMPORT_REGEX);
-            console.log(importMatched)
             if (!importMatched || !importMatched[2]) return `<p>${text}</p>`;
             let filePath = importMatched[2];
             if (!path.extname(filePath)) filePath += ".md";
