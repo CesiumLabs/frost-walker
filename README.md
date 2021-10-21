@@ -3,6 +3,18 @@ A template engine written for frost
 
 # Example
 
+## With Express
+
+```js
+const frost = require("frost-walker");
+const app = express();
+
+app.engine("frost", frost.middleware.express());
+app.set("view engine", "frost");
+```
+
+## Basic Example
+
 `index.js`
 ```js
 const frost = require("frost-walker");
@@ -24,11 +36,11 @@ console.log(rendered);
 ```md
 # Hello World
 
-Hello there, my name is {{locals.name}} and I made this with {{locals.engine}} template engine.
+Hello there, my name is {{name}} and I made this with {{engine}} template engine.
 
 I love coding in these languages:
 
-{% for (const language of locals.languages) { %}
+{% for (const language of languages) { %}
 - {{language}}
 {% } %}
 

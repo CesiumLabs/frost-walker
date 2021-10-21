@@ -1,10 +1,23 @@
-export function compile<T = unknown>(source: string, locals?: T) {
+import { FrostError } from "./FrostError";
+
+export function compile<T = unknown>(source: string, options?: T) {
     if (!source || typeof source !== "string") return "";
 
-    return new Function(
-        "frostRender",
-        `let locals = ${JSON.stringify(locals || {})};let output = ${JSON.stringify(source)
-            .replace(/{{(.+?)}}/g, '"+($1)+"')
-            .replace(/{%(.+?)%}/g, '";$1\noutput+="')};return output;`
-    )() as string;
+    let randomName = "",
+        possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+    for (let i = 0; i < 5; i++) {
+        randomName += `${possible.charAt(Math.floor(Math.random() * possible.length))}${i}`;
+    }
+
+    try {
+        return new Function(
+            "frostRenderer",
+            `let frost=${JSON.stringify(options || {})},{${Object.keys(options).join(",")}}=frost,${randomName}=${JSON.stringify(source)
+                .replace(/{{(.+?)}}/g, '"+($1)+"')
+                .replace(/{#(.+?)#}/g, "")
+                .replace(/{%(.+?)%}/g, `";$1\n${randomName}+="`)};return ${randomName};`
+        )() as string;
+    } catch (err) {
+        throw new FrostError(`Error while rendering template:\n${err}`, "FrostRendererError");
+    }
 }
