@@ -10,14 +10,14 @@ export function renderFile<T = unknown>(filePath: string, data?: T) {
     if (!path.isAbsolute(filePath)) filePath = path.resolve(filePath);
     // @ts-ignore
     if (!data.__dirname) data.__dirname = path.dirname(filePath);
-    return render(src, data);
+    return render(src, data, path.extname(filePath));
 }
 
-export function render<T = unknown>(source: string, data?: T) {
+export function render<T = unknown>(source: string, data?: T, ext?: string) {
     if (!source || typeof source !== "string") return "";
     // @ts-ignore
     if (!data.__dirname && data?.settings?.views) data.__dirname = data.settings.views;
-    const converted = converter(source, data ?? {});
+    const converted = converter(source, data ?? {}, ext);
     const rendered = compile(converted, data ?? {});
     return rendered;
 }

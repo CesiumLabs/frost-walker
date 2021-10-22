@@ -25,7 +25,7 @@ app.set("view engine", "frost");
 `index.js`
 ```js
 const frost = require("frost-walker");
-frost.renderFile("./demo.md", {
+frost.renderFile("./main.frost", {
     name: "John Doe",
     engine: "Frost Walker",
     languages: [

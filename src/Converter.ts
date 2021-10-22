@@ -41,8 +41,8 @@ function inject(text: string, data: any = {}): string {
     return inject(childText, data);
 }
 
-export function converter<T>(source: string, data?: T) {
+export function converter<T>(source: string, data?: T, ext?: string) {
     if (!source || typeof source !== "string") throw new FrostError("Source was not provided");
     source = source.replace(COMMENT_REGEX, "");
-    return inject(source, data || {});
+    return inject(ext === "md" ? clean(marked(source)) : source, data || {});
 }
