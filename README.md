@@ -1,3 +1,5 @@
+# This project is archived and frost-walker is now implemented natively inside frost project
+
 # frost-walker
 A template engine written for frost
 
