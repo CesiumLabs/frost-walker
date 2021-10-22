@@ -1,6 +1,13 @@
 # frost-walker
 A template engine written for frost
 
+# Syntax
+- `#include "componentPath"`           :: Path to the component (Alias: `#import`). Renders markdown if file path ends with `.md`
+- `<frost>JAVASCRIPT</frost>`          :: Renders JavaScript output
+- `<frost embed>JAVASCRIPT</frost>`    :: Executes JavaScript without rendering the output
+- `<!-- TEXT -->`                      :: Comment
+
+
 # Example
 
 ## With Express
@@ -18,7 +25,7 @@ app.set("view engine", "frost");
 `index.js`
 ```js
 const frost = require("frost-walker");
-const rendered = frost.renderFile("./demo.md", {
+frost.renderFile("./demo.md", {
     name: "John Doe",
     engine: "Frost Walker",
     languages: [
@@ -28,56 +35,23 @@ const rendered = frost.renderFile("./demo.md", {
         "C++"
     ]
 });
-
-console.log(rendered);
 ```
 
-`demo.md`
+`main.frost`
+```html
+#include "./heading.md"
+
+<h1>Hello World</h1>
+```
+
+`heading.md`
 ```md
 # Hello World
 
-Hello there, my name is {{name}} and I made this with {{engine}} template engine.
+Hello there, my name is <frost>name</frost> and I made this with <frost>engine</frost> template engine.
 
 I love coding in these languages:
-
-{% for (const language of languages) { %}
-- {{language}}
-{% } %}
-
-# My beautiful website
-
-#include "./demo.html"
-```
-
-`demo.html`
-```html
-<h1 class="demo">This is my website!</h1>
-<style>
-    .demo {
-        text-align: center;
-        font-weight: bold;
-    }
-</style>
-```
-
-## Output
-
-```html
-<h1 id="hello-world">Hello World</h1>
-<p>Hello there, my name is John Doe and I made this with Frost Walker template engine.</p>
-<p>I love coding in these languages:</p>
-<ul>
-<li>JavaScript</li>
-<li>TypeScript</li>
-<li>Python</li>
-<li>C++</li>
-</ul>
-<h1 id="my-beautiful-website">My beautiful website</h1>
-<h1 class="demo">This is my website!</h1>
-<style>
-.demo {
-    text-align: center;
-    font-weight: bold;
-}
-</style>
+<frost embed>for (const language of languages) {</frost>
+- <frost>language</frost>
+<frost embed>}</frost>
 ```

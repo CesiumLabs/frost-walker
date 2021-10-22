@@ -4,19 +4,22 @@ import path from "path";
 import { FrostError } from "./FrostError";
 
 const IMPORT_REGEX = /#(include|import) "(.+)"/g;
+const COMMENT_REGEX = /<!--(.+?)-->/g;
+const clean = (t: string) =>
+    t
+        .replace(COMMENT_REGEX, "")
+        .replace(/&quot;/g, '"')
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">");
 
 marked.use({
-    gfm: true,
     xhtml: true,
     sanitize: false
 });
 
 function inject(text: string, data: any = {}): string {
     if (!text) return "";
-    let childText = text
-        .replace(/&quot;/g, '"')
-        .replace(/&lt;/g, "<")
-        .replace(/&gt;/g, ">");
+    let childText = clean(text);
     if (!childText.match(IMPORT_REGEX)) return childText;
 
     const importMatched = childText.matchAll(IMPORT_REGEX);
@@ -28,17 +31,18 @@ function inject(text: string, data: any = {}): string {
         if (!path.extname(filePath)) filePath += ".frost";
         if (filePath.startsWith("./") && data?.__dirname) filePathFinal = `${data.__dirname}/${filePath.replace(/.\//, "")}`;
         if (!fs.existsSync(filePathFinal)) throw new FrostError(`Could not locate include file "${filePath}"`);
-        const fileData = fs.readFileSync(filePathFinal, { encoding: "utf-8" });
-        childText = childText.replace(matched.input, fileData);
+
+        const fileData = fs.readFileSync(filePathFinal, { encoding: "utf-8" }).replace(COMMENT_REGEX, "");
+
+        childText = childText.replace(matched[0], filePath.endsWith(".md") ? clean(marked(fileData)) : fileData);
     }
 
-    const injectedResult = inject(childText, data);
-    if (!injectedResult || injectedResult === childText) return childText;
-    return injectedResult;
+    if (!childText.match(IMPORT_REGEX)) return childText;
+    return inject(childText, data);
 }
 
 export function converter<T>(source: string, data?: T) {
     if (!source || typeof source !== "string") throw new FrostError("Source was not provided");
-    const rendered = marked(source);
-    return inject(rendered, data || {}) || rendered;
+    source = source.replace(COMMENT_REGEX, "");
+    return inject(source, data || {});
 }

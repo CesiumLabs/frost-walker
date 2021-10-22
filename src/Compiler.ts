@@ -11,11 +11,10 @@ export function compile<T = unknown>(source: string, options?: T) {
 
     try {
         return new Function(
-            "frostRenderer",
             `let frost=${JSON.stringify(options || {})},{${Object.keys(options).join(",")}}=frost,${randomName}=${JSON.stringify(source)
-                .replace(/{{(.+?)}}/g, '"+($1)+"')
-                .replace(/{#(.+?)#}/g, "")
-                .replace(/{%(.+?)%}/g, `";$1\n${randomName}+="`)};return ${randomName};`
+                .replace(/<!--((.|\n)+?)-->/g, "")
+                .replace(/\<frost\>((.|\n)+?)\<\/frost\>/g, '"+($1)+"')
+                .replace(/\<frost embed\>((.|\n)+?)\<\/frost\>/g, `";$1\n${randomName}+="`)};return ${randomName};`
         )() as string;
     } catch (err) {
         throw new FrostError(`Error while rendering template:\n${err}`, "FrostRendererError");
