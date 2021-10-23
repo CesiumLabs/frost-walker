@@ -1,13 +1,14 @@
 import { FrostError } from "./FrostError";
 
+const possible: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+
 export function compile<T = unknown>(source: string, options?: T) {
     if (!source || typeof source !== "string") return "";
 
-    let randomName = "",
-        possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_";
-    for (let i = 0; i < 5; i++) {
-        randomName += `${possible.charAt(Math.floor(Math.random() * possible.length))}${i}`;
-    }
+    let randomName: string = "",
+        
+    for (let i = 0; i < 5; i++)
+        randomName += `${possible.charAt(Math.floor(Math.random() * 27))}${i}`;
 
     try {
         return new Function(
